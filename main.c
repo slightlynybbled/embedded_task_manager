@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <stdint.h>
 #include <msp430.h>
 #include "task.h"
 
@@ -11,8 +12,8 @@
 #define LED2_OFF	(P1OUT &= ~BIT6)
 #define LED2_IS_ON	((P1OUT & BIT6) > 0)
 
-#define LED_1_BLINK_PERIOD	4
-#define LED_2_BLINK_PERIOD	8
+#define LED_1_BLINK_PERIOD	128
+#define LED_2_BLINK_PERIOD	256
 #define BTN_POLL_PERIOD		1
 
 #define SWITCH_IS_ON	((P1IN & BIT3) > 0)
@@ -63,10 +64,11 @@ void blinkLed2(void){
 
 void debounceButton(void){
 	static bool btnState = false;
-	static int btnCounter = 0;
-	const int btnCounterMax = 1;
+	static int8_t btnCounter = 0;
+	const int8_t btnCounterMax = 16;
 	static bool ledState = false;
 
+	/* when switch is on, increment btnCounter, else decrement */
 	if(SWITCH_IS_ON){
 		btnCounter++;
 	}else{

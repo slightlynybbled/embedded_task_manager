@@ -15,7 +15,7 @@ void TMR_init(void (*functPtr)()){
 	TMR_timedFunctPtr = functPtr;
 
 	TA0CTL |= TASSEL1;	/* SMCLK */
-	TACCR0 = 0xffff;	/* timer period */
+	TACCR0 = 2048;	/* timer period */
 
 	TA0CTL |= MC0;
 	TA0CTL &= ~MC1;
