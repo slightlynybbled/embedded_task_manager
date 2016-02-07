@@ -9,9 +9,9 @@
 #include "lib430.h"
 
 #define MAX_NUM_OF_TASKS		4
-#define MAX_MILLISECONDS_VAL	0x7ff00000
+#define MAX_SYS_TICKS_VAL	0x7ff00000
 
-static volatile uint32_t milliSeconds = 0;
+static volatile uint32_t systemTicks = 0;
 
 /* create structure that consists of a function pointer and period */
 typedef struct {
@@ -22,29 +22,29 @@ typedef struct {
 
 static Task task[MAX_NUM_OF_TASKS];
 
-void TASK_milliSecCounter();	// function declaration
+void TASK_systemTicksCounter();	// function declaration
 
-void TASK_milliSecCounter(){
-	milliSeconds++;
+void TASK_systemTicksCounter(){
+	systemTicks++;
 
-	/* gracefully reset the microseconds counter
+	/* gracefully reset the system ticks counter
 	 * if it is about to roll over */
-	if(milliSeconds >= MAX_MILLISECONDS_VAL){
+	if(systemTicks >= MAX_SYS_TICKS_VAL){
 		TASK_resetTime(0);
 	}
 }
 
 uint32_t TASK_getTime(){
     uint8_t sameFlag = 0;
-    uint32_t now0 = milliSeconds;
-    uint32_t now1 = milliSeconds;
+    uint32_t now0 = systemTicks;
+    uint32_t now1 = systemTicks;
     
     /* this code ensures that two sequential reads get the same value
      * before returning in order to avoid problems with atomic reads
-     * of the milliSeconds location */
+     * of the systemTicks location (a 32-bit value on a 16-bit processor) */
     while(sameFlag == 0){
-        now0 = milliSeconds;
-        now1 = milliSeconds;
+        now0 = systemTicks;
+        now1 = systemTicks;
         
         if(now0 == now1){
             sameFlag = 1;
@@ -69,8 +69,8 @@ void TASK_resetTime(uint32_t time){
 
         /* reset the clock */
 		TMR_disableInterrupt();
-		milliSeconds = time;
-        TMR_init(&TASK_milliSecCounter);
+		systemTicks = time;
+        TMR_init(&TASK_systemTicksCounter);
 
 		/* place the difference between the time that each task needed to execute and the new time */
 		for(i = 0; i < MAX_NUM_OF_TASKS; i++){
@@ -80,7 +80,7 @@ void TASK_resetTime(uint32_t time){
 }
 
 void TASK_init(){
-    TMR_init(&TASK_milliSecCounter);
+    TMR_init(&TASK_systemTicksCounter);
 
     /* initialize all of the tasks */
     uint16_t i;
@@ -100,7 +100,7 @@ void TASK_add(void (*functPtr)(), uint32_t period){
 		if(task[i].taskFunctPtr == functPtr){
 			if(task[i].period != period){
 				task[i].period = period;
-				task[i].nextExecutionTime = milliSeconds + period;
+				task[i].nextExecutionTime = systemTicks + period;
 			}
 
 			taskExists = 1;
@@ -114,7 +114,7 @@ void TASK_add(void (*functPtr)(), uint32_t period){
 			if(task[i].taskFunctPtr == 0){
 				task[i].taskFunctPtr = functPtr;
 				task[i].period = period;
-				task[i].nextExecutionTime = milliSeconds + period;
+				task[i].nextExecutionTime = systemTicks + period;
 
 				break;
 			}
@@ -129,7 +129,7 @@ void TASK_remove(void (*functPtr)()){
 		if(task[i].taskFunctPtr == functPtr){
 			task[i].taskFunctPtr = 0;
 			task[i].period = 10000;
-			task[i].nextExecutionTime = MAX_MILLISECONDS_VAL;
+			task[i].nextExecutionTime = MAX_SYS_TICKS_VAL;
 		}
 	}
 }
