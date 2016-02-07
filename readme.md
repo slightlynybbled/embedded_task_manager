@@ -1,3 +1,5 @@
+You may find more detailed explanation at http://www.forembed.com/the-not-quite-rtos-a-task-manager/
+
 # Purpose #
 
 This project is to illustrate a simple task manager application that you should be able to easily drop into any 8-bit or 16-bit microcontroller.  This is NOT a full RTOS, just a simple helper that will allow multiple 'tasks' to easily be added and removed from the execution que.
