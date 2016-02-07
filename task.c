@@ -8,7 +8,7 @@
 #include "task.h"
 #include "lib430.h"
 
-#define MAX_NUM_OF_TASKS		4
+#define MAX_NUM_OF_TASKS	4
 #define MAX_SYS_TICKS_VAL	0x7ff00000
 
 static volatile uint32_t systemTicks = 0;
