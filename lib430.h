@@ -8,8 +8,7 @@
 #ifndef LIB430_H_
 #define LIB430_H_
 
-
-
-
+void TMR_init(void (*functPtr)());
+void TMR_disableInterrupt();
 
 #endif /* LIB430_H_ */

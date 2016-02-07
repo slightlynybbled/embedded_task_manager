@@ -6,10 +6,10 @@
  */
  
 #include "task.h"
-#include "lib_430fr.h"
+#include "lib430.h"
 
-#define MAX_NUM_OF_TASKS		16
-#define MAX_MILLISECONDS_VAL	0xffffffff
+#define MAX_NUM_OF_TASKS		4
+#define MAX_MILLISECONDS_VAL	0x7ff00000
 
 static volatile uint32_t milliSeconds = 0;
 
@@ -29,7 +29,7 @@ void TASK_milliSecCounter(){
 
 	/* gracefully reset the microseconds counter
 	 * if it is about to roll over */
-	if(milliSeconds >= 0x7ff00000){
+	if(milliSeconds >= MAX_MILLISECONDS_VAL){
 		TASK_resetTime(0);
 	}
 }
@@ -68,9 +68,9 @@ void TASK_resetTime(uint32_t time){
 		}
 
         /* reset the clock */
-        TA0_disableInterrupt();
+		TMR_disableInterrupt();
 		milliSeconds = time;
-        TA0_enableInterrupt(&TASK_milliSecCounter);
+        TMR_init(&TASK_milliSecCounter);
 
 		/* place the difference between the time that each task needed to execute and the new time */
 		for(i = 0; i < MAX_NUM_OF_TASKS; i++){
@@ -80,10 +80,7 @@ void TASK_resetTime(uint32_t time){
 }
 
 void TASK_init(){
-	TA0_init();
-    TA0_enableInterrupt(&TASK_milliSecCounter);
-   	TA0_setPeriod(1000);
-    TA0_run();
+    TMR_init(&TASK_milliSecCounter);
 
     /* initialize all of the tasks */
     uint16_t i;
@@ -138,15 +135,6 @@ void TASK_remove(void (*functPtr)()){
 }
 
 void TASK_manage(){
-	#if (!defined(__MSP430FR5989__) && !defined(__MSP430FR5889__))
-	/* in linux, use threads to accomplish the 
-     * equivalent of the above timer interrupt */
-    pthread_t milliSecondTimerThread;	// declare the thread
-    if(pthread_create(&milliSecondTimerThread, NULL, TASK_milliSecCounter, NULL)){
-		printf("Error creating thread...\n");
-	}
-	#endif
-	
 	while(1){
 		uint16_t i;
 		for(i = 0; i < MAX_NUM_OF_TASKS; i++){
@@ -158,9 +146,5 @@ void TASK_manage(){
 				}
 			}
 		}
-		
-		#if (!defined(__MSP430FR5989__) && !defined(__MSP430FR5889__))
-		usleep(500);
-		#endif
 	}
 }
