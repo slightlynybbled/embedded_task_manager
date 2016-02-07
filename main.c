@@ -5,16 +5,16 @@
 
 /* defines to make things a bit more readable */
 #define LED1_ON		(P1OUT |= BIT0)
-#define LED1_OFF	(P1OUT &= ~BIT0)
+#define LED1_OFF    (P1OUT &= ~BIT0)
 #define LED1_IS_ON	((P1OUT & BIT0) > 0)
 
 #define LED2_ON		(P1OUT |= BIT6)
 #define LED2_OFF	(P1OUT &= ~BIT6)
-#define LED2_IS_ON	((P1OUT & BIT6) > 0)
+#define LED2_IS_ON  ((P1OUT & BIT6) > 0)
 
-#define LED_1_BLINK_PERIOD	128
-#define LED_2_BLINK_PERIOD	256
-#define BTN_POLL_PERIOD		1
+#define LED_1_BLINK_PERIOD	200
+#define LED_2_BLINK_PERIOD	400
+#define BTN_POLL_PERIOD		9
 
 #define SWITCH_IS_ON	((P1IN & BIT3) > 0)
 
@@ -65,7 +65,7 @@ void blinkLed2(void){
 void debounceButton(void){
 	static bool btnState = false;
 	static int8_t btnCounter = 0;
-	const int8_t btnCounterMax = 16;
+	const int8_t btnCounterMax = 6;
 	static bool ledState = false;
 
 	/* when switch is on, increment btnCounter, else decrement */
