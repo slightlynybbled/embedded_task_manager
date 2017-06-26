@@ -1,4 +1,4 @@
-You may find more detailed explanation at [for(embed)](http://www.forembed.com/the-not-quite-rtos-a-task-manager).
+You may find more detailed explanation at [for(embed)](http://www.forembed.com/the-not-quite-rtos-a-task-manager.html).
 
 # Purpose #
 
